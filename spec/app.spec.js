@@ -65,6 +65,37 @@ describe('app', () => {
             );
           });
       });
+      it('PATCH 201: "/:article_id" returns a 201 with the article object', () => {
+        return request(app)
+          .patch('/api/articles/2')
+          .send({ inc_votes: 5 })
+          .expect(201)
+          .then(({ body: { article } }) => {
+            expect(article.votes).to.be.equal(5);
+          });
+      });
+      it('PATCH 400: "/:article_id" returns a 400 error when passed a bad request', () => {
+        return request(app)
+          .patch('/api/articles/2')
+          .send({ dec_votes: 5 })
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.be.equal(
+              'bad request: patch request must be for inc_votes only'
+            );
+          });
+      });
+      it('PATCH 400: "/:article_id" returns a 400 error when passed a bad request', () => {
+        return request(app)
+          .patch('/api/articles/2')
+          .send({ inc_votes: 5, something: 'somethingelse' })
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.be.equal(
+              'bad request: patch request must be for inc_votes only'
+            );
+          });
+      });
       it('GET 404: "/:article_id" returns a 404 error where no article is found', () => {
         return request(app)
           .get('/api/articles/15')
