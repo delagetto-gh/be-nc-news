@@ -16,15 +16,15 @@ describe('formatDates', () => {
   it('converts the created_at timestamp for a single-item array', () => {
     const input = [{ created_at: 634694340 }];
     const actual = formatDates(input);
-    const expected = [{ created_at: new Date(634694340 * 1000) }];
+    const expected = [{ created_at: new Date(634694340) }];
     expect(actual).to.eql(expected);
   });
   it('handles multi-item arrays', () => {
     const input = [{ created_at: 634694340 }, { created_at: 600694340 }];
     const actual = formatDates(input);
     const expected = [
-      { created_at: new Date(634694340 * 1000) },
-      { created_at: new Date(600694340 * 1000) }
+      { created_at: new Date(634694340) },
+      { created_at: new Date(600694340) }
     ];
     expect(actual).to.eql(expected);
   });

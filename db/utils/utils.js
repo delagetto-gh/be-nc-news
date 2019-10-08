@@ -1,12 +1,13 @@
 exports.formatDates = list => {
-  const newArr = [...list];
+  if (!list.length) return [];
 
-  if (!list.length) return newArr;
-
-  newArr.forEach(item => {
-    let newTimestamp = new Date(item.created_at * 1000);
-    item.created_at = newTimestamp;
+  const newArr = list.map(item => {
+    const newItem = { ...item };
+    let newTimestamp = new Date(item.created_at);
+    newItem.created_at = newTimestamp;
+    return newItem;
   });
+
   return newArr;
 };
 
@@ -21,17 +22,20 @@ exports.makeRefObj = (arr, key, value) => {
 };
 
 exports.formatComments = (comments, articleRef) => {
-  const newComments = [...comments];
-  if (!comments.length) return newComments;
+  if (!comments.length) return [];
 
-  newComments.forEach((comment, i) => {
-    const articleID = articleRef[newComments[i].belongs_to];
-    comment.article_id = articleID;
-    delete comment.belongs_to;
+  const newComments = comments.map((comment, i) => {
+    const formattedComment = { ...comment };
 
-    const createdBy = comment.created_by;
-    comment.author = createdBy;
-    delete comment.created_by;
+    const articleID = articleRef[comments[i].belongs_to];
+    formattedComment.article_id = articleID;
+    delete formattedComment.belongs_to;
+
+    const createdBy = formattedComment.created_by;
+    formattedComment.author = createdBy;
+    delete formattedComment.created_by;
+    
+    return formattedComment;
   });
 
   return newComments;
