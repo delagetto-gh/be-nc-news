@@ -6,12 +6,13 @@ const chaiSorted = require('sams-chai-sorted');
 const { expect } = require('chai');
 chai.use(chaiSorted);
 const { connection } = require('../connection');
+const apiJSON = require('../endpoints.json');
 
 describe('app', () => {
   beforeEach(() => connection.seed.run());
   after(() => connection.destroy());
-  describe('/bad-path', () => {
-    it('ANYMETHOD 404: "/" returns a 404 error when given a bad path', () => {
+  describe('bad-path', () => {
+    it('ANYMETHOD 404: "/" returns a 404 error when given an invalid path', () => {
       return request(app)
         .get('/bad-path')
         .expect(404)
@@ -31,6 +32,14 @@ describe('app', () => {
     });
   });
   describe('/api', () => {
+    it('GET 200: "/" responds with a JSON object with all', () => {
+      return request(app)
+        .get('/api')
+        .expect(200)
+        .then(({ body }) => {
+          expect(body).to.be.eql(apiJSON);
+        });
+    });
     describe('/topics', () => {
       it('GET 200: "/" returns all topics', () => {
         return request(app)
@@ -226,7 +235,11 @@ describe('app', () => {
       it('POST 201: "/" returns a posted article', () => {
         return request(app)
           .post('/api/articles/1/comments')
-          .send({ username: 'butter_bridge', body: 'testing, testing 1,2' })
+          .send({
+            username: 'butter_bridge',
+            body: 'testing, testing 1,2',
+            article_id: 1
+          })
           .expect(201)
           .then(({ body: { postedComment } }) => {
             expect(postedComment).to.have.keys(

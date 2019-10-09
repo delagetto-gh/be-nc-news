@@ -2,26 +2,143 @@
   "GET /api": {
     "description": "serves up a json representation of all the available endpoints of the api"
   },
+  "GET /api/users": {
+    "description": "serves an array of all users",
+    "queries": [],
+    "exampleResponse": {
+      "users": [
+        {
+          "username": "GustavHolst",
+          "avatar_url": "https://en.wikipedia.org/wiki/Gustav_Holst#/media/File:Gustav_Holst.jpg",
+          "name": "Gustav Holst"
+        },
+        {
+          "username": "SectionBoyz",
+          "avatar_url": "https://s3-eu-west-1.amazonaws.com/grm-assets/5153/section-boyz.png",
+          "name": "Section Boyz"
+        }
+      ]
+    }
+  },
+  "GET /api/articles/:article_id": {
+    "description": "serves article object for the specified article_id",
+    "queries": [],
+    "exampleResponse": {
+      "author": "GustavHolst",
+      "title": "The Planets - Jupiter",
+      "article_id": "5",
+      "body": "Listen to this: paam paaam paaaam bam bam!!! dom dom dom dom dom dom dom",
+      "topic": "Classical Music",
+      "created_at": "1918-09-29T18:00:00",
+      "votes": 45689,
+      "comment_count": 987
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "takes an object denoting the number of votes an article should be increased by (only) and responds with the updated article object",
+    "queries": [],
+    "exampleBody": { "inc_votes": 11 },
+    "exampleResponse": {
+      "author": "GustavHolst",
+      "title": "The Planets - Jupiter",
+      "article_id": "5",
+      "body": "Listen to this: paam paaam paaaam bam bam!!! dom dom dom dom dom dom dom",
+      "topic": "Classical Music",
+      "created_at": "1918-09-29T18:00:00",
+      "votes": 45700,
+      "comment_count": 987
+    }
+  },
+  "GET /api/articles": {
+    "description": "serves an array of article objects",
+    "queries": ["sort_by", "order", "author", "topic"],
+    "exampleResponse": [
+      {
+        "author": "GustavHolst",
+        "title": "The Planets - Jupiter",
+        "article_id": 1,
+        "body": "Listen to this: paam paaam paaaam bam bam!!! dom dom dom dom dom dom dom",
+        "topic": "Classical Music",
+        "created_at": "1918-09-29T18:00:00",
+        "votes": 45689,
+        "comment_count": 987
+      },
+      {
+        "author": "Section Boyz",
+        "title": "Lock Arf",
+        "article_id": 2,
+        "body": "Guys, we have a new song out. Lyrics below... Quick, phoned up bro and he gave me a brick. Hopped out the cab, never came in a whip. Box full of bags, not trainers and kicks. On a trap round, ain't changing a bit. With a mad browning that came through my bits",
+        "topic": "Drill",
+        "created_at": "2015-09-30T23:59:00",
+        "votes": 2094345678,
+        "comment_count": 1039987659
+      }
+    ]
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "takes a comment object and returns the posted version",
+    "exampleBody": {
+      "username": "GustavHolst",
+      "body": "I don't know why I bother when there's music /this good/ out",
+      "article_id": 2
+    },
+    "queries": [],
+    "exampleResponse": {
+      "comment_id": 1039987660,
+      "author": "GustavHolst",
+      "body": "I don't know why I bother when there's music /this good/ out",
+      "created_at": "2019-10-09T16:30:00",
+      "article_id": 2,
+      "votes": 0
+    }
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "serves an array of all comments for a specified article",
+    "queries": ["sort_by", "order"],
+    "exampleResponse": [
+      {
+        "comment_id": 1039987660,
+        "author": "GustavHolst",
+        "body": "I don't know why I bother when there's music /this good/ out",
+        "created_at": "2019-10-09T16:30:00",
+        "article_id": 2,
+        "votes": 0
+      },
+      {
+        "comment_id": 5320223,
+        "author": "JimiHendrix",
+        "body": "Wow - so deep. :'( ",
+        "created_at": "2018-03-19T10:31:00",
+        "article_id": 2,
+        "votes": 0
+      }
+    ]
+  },
+  "PATCH /api/comments/:comment_id": {
+    "description": "takes an object denoting the number of votes a comment should be increased by (only) and responds with the updated comment object",
+    "queries": [],
+    "exampleBody": {
+      "inc_votes": 1
+    },
+    "exampleResponse": {
+      "comment_id": 5320223,
+      "author": "JimiHendrix",
+      "body": "Wow - so deep. :'( ",
+      "created_at": "2018-03-19T10:31:00",
+      "article_id": 2,
+      "votes": 1
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "delets the specified comment. No response provided - only a 204 error confirming deletion",
+    "queries": [],
+    "exampleResponse": {}
+  },
   "GET /api/topics": {
     "description": "serves an array of all topics",
     "queries": [],
     "exampleResponse": {
       "topics": [{ "slug": "football", "description": "Footie!" }]
-    }
-  },
-  "GET /api/articles": {
-    "description": "serves an array of all topics",
-    "queries": ["author", "topic", "sort_by", "order"],
-    "exampleResponse": {
-      "articles": [
-        {
-          "title": "Seafood substitutions are increasing",
-          "topic": "cooking",
-          "author": "weegembump",
-          "body": "Text from the article..",
-          "created_at": 1527695953341
-        }
-      ]
     }
   }
 }
