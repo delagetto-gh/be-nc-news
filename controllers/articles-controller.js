@@ -6,11 +6,15 @@ const {
 
 exports.getArticle = (req, res, next) => {
   const { article_id } = req.params;
-  selectArticle(article_id)
-    .then(([article]) => {
-      res.status(200).send({ article });
-    })
-    .catch(next);
+  if (isNaN(parseInt(article_id))) {
+    next({ status: 400, msg: 'bad request: article_id must be a number' });
+  } else {
+    selectArticle(article_id)
+      .then(([article]) => {
+        res.status(200).send({ article });
+      })
+      .catch(next);
+  }
 };
 
 exports.patchArticle = (req, res, next) => {
@@ -21,12 +25,16 @@ exports.patchArticle = (req, res, next) => {
     });
   } else {
     const { inc_votes } = req.body;
-    const { article_id } = req.params;
-    amendArticle(article_id, inc_votes)
-      .then(([article]) => {
-        res.status(201).send({ article });
-      })
-      .catch(next);
+    if (isNaN(parseInt(inc_votes))) {
+      next({ status: 400, msg: `bad request: "${inc_votes}" is not a number` });
+    } else {
+      const { article_id } = req.params;
+      amendArticle(article_id, inc_votes)
+        .then(([article]) => {
+          res.status(201).send({ article });
+        })
+        .catch(next);
+    }
   }
 };
 

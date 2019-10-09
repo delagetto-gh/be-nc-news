@@ -22,7 +22,10 @@ exports.amendArticle = (article_id, inc_votes) => {
     .returning('*')
     .then(article => {
       if (!article.length)
-        return Promise.reject({ status: 404, msg: 'article not found' });
+        return Promise.reject({
+          status: 404,
+          msg: `article ${article_id} not found`
+        });
       else return article;
     });
 };
@@ -33,6 +36,7 @@ exports.selectArticles = ({
   author,
   topic
 }) => {
+  if (order !== 'asc') order = 'desc';
   return connection
     .select('articles.*')
     .from('articles')
@@ -43,5 +47,13 @@ exports.selectArticles = ({
     .modify(chain => {
       if (author) chain.where('articles.author', author);
       if (topic) chain.where('articles.topic', topic);
+    })
+    .then(articles => {
+      if (!articles.length)
+        return Promise.reject({
+          status: 404,
+          msg: 'no articles to return for query'
+        });
+      else return articles;
     });
 };

@@ -1,4 +1,9 @@
-const { insertComment, selectComments } = require('../models/comments-model');
+const {
+  insertComment,
+  selectComments,
+  updateComment,
+  removeComment
+} = require('../models/comments-model');
 
 exports.postComment = (req, res, next) => {
   if (!req.body.hasOwnProperty('username') || !req.body.hasOwnProperty('body'))
@@ -31,10 +36,40 @@ exports.getComments = (req, res, next) => {
       msg: 'bad request - article_id must be a number'
     });
   } else {
-    selectComments(article_id, req.queries)
+    const { sort_by } = req.query;
+    const { order } = req.query;
+    selectComments(article_id, sort_by, order)
       .then(comments => {
         res.status(200).send({ comments });
       })
       .catch(next);
   }
+};
+
+exports.patchComment = (req, res, next) => {
+  if (!Object.keys(req.body).every(item => item === 'inc_votes')) {
+    return next({
+      status: 400,
+      msg: 'bad request: request must be for inc_votes and inc_votes only'
+    });
+  } else if (isNaN(parseInt(req.body.inc_votes))) {
+    return next({
+      status: 400,
+      msg: `bad request: inc_votes value must be a number`
+    });
+  } else {
+    updateComment(req.params.comment_id, req.body.inc_votes)
+      .then(([patchedComment]) => {
+        res.status(201).send({ patchedComment });
+      })
+      .catch(next);
+  }
+};
+
+exports.deleteComment = (req, res, next) => {
+  removeComment(req.params.comment_id)
+    .then(() => {
+      res.sendStatus(204);
+    })
+    .catch(next);
 };

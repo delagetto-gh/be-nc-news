@@ -7,10 +7,12 @@ exports.handleCustomErrors = (err, req, res, next) => {
 exports.handlePSQLErrors = (err, req, res, next) => {
   if (err.code === '23503') {
     res.status(404).send({ msg: 'username or article not found' });
+  } else if (err.code === '42703') {
+    res.status(400).send({ msg: 'bad request: query column is not valid' });
   } else next(err);
 };
 
-exports.handleServerErrors = () => {
+exports.handleServerErrors = (err, req, res, next) => {
   console.log(err);
 };
 
