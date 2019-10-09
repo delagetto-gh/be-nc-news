@@ -172,5 +172,92 @@ describe('app', () => {
           });
       });
     });
+    describe.only('/comments', () => {
+      it('POST 201: "/" returns a posted article', () => {
+        return request(app)
+          .post('/api/articles/1/comments')
+          .send({ username: 'butter_bridge', body: 'testing, testing 1,2' })
+          .expect(201)
+          .then(({ body: { postedComment } }) => {
+            expect(postedComment).to.have.keys(
+              'comment_id',
+              'author',
+              'article_id',
+              'votes',
+              'created_at',
+              'body'
+            );
+            expect(postedComment.comment_id).to.be.equal(19);
+          });
+      });
+      it('POST 400: request w/ bad keys returns "bad request..."', () => {
+        return request(app)
+          .post('/api/articles/2/comments')
+          .send({ losername: 'butter_bridge', body: 'testing, testing 1,2' })
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal(
+              'bad request - comment must have username & body'
+            );
+          });
+      });
+      it('POST 400: "/bad-article_id" returns "bad request..."', () => {
+        return request(app)
+          .post('/api/articles/article/comments')
+          .send({ username: 'butter_bridge', body: 'testing, testing 1,2' })
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal('bad request - article_id must be a number');
+          });
+      });
+      it('POST 404: request w/ non-existent username returns 404', () => {
+        return request(app)
+          .post('/api/articles/1/comments')
+          .send({ username: 'GustavHolst', body: 'testing, testing 1,2' })
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal('username or article not found');
+          });
+      });
+      it('POST 404: request w/ non-existent article_id returns 404', () => {
+        return request(app)
+          .post('/api/articles/45/comments')
+          .send({ username: 'butter_bridge', body: 'testing, testing 1,2' })
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal('username or article not found');
+          });
+      });
+      it('GET 200: "/" returns all comments for a specified article', () => {
+        return request(app)
+          .get('/api/articles/1/comments')
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments).to.be.an('array');
+            comments.forEach(comment => {
+              expect(comment.article_id).to.be.equal(1);
+            });
+          });
+      });
+
+      /*
+GET /api/articles/:article_id/comments
+```
+
+#### Responds with
+
+- an array of comments for the given `article_id` of which each comment should have the following properties:
+  - `comment_id`
+  - `votes`
+  - `created_at`
+  - `author` which is the `username` from the users table
+  - `body`
+
+#### Accepts queries
+
+- `sort_by`, which sorts the comments by any valid column (defaults to created_at)
+- `order`, which can be set to `asc` or `desc` for ascending or descending (defaults to descending)
+      */
+    });
   });
 });

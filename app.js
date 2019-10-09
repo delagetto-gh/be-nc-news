@@ -3,7 +3,8 @@ const app = express();
 const apiRouter = require('./routers/api-router');
 const {
   handleCustomErrors,
-  handleRejectionErrors
+  handlePSQLErrors,
+  handleServerErrors
 } = require('./error-handlers');
 
 app.use(express.json());
@@ -14,6 +15,6 @@ app.use('/*', (req, res, next) => {
   res.status(404).send({ msg: 'bad path' });
 });
 
-app.use(handleCustomErrors, handleRejectionErrors);
+app.use(handleCustomErrors, handlePSQLErrors, handleServerErrors);
 
 module.exports = app;

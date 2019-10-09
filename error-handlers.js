@@ -4,7 +4,13 @@ exports.handleCustomErrors = (err, req, res, next) => {
   } else next(err);
 };
 
-exports.handleRejectionErrors = (err, req, res, next) => {
+exports.handlePSQLErrors = (err, req, res, next) => {
+  if (err.code === '23503') {
+    res.status(404).send({ msg: 'username or article not found' });
+  } else next(err);
+};
+
+exports.handleServerErrors = () => {
   console.log(err);
 };
 

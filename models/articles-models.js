@@ -30,8 +30,8 @@ exports.amendArticle = (article_id, inc_votes) => {
 exports.selectArticles = ({
   sort_by = 'created_at',
   order = 'desc',
-  author = '%',
-  topic = '%'
+  author,
+  topic
 }) => {
   return connection
     .select('articles.*')
@@ -40,6 +40,8 @@ exports.selectArticles = ({
     .leftJoin('comments', 'comments.article_id', '=', 'articles.article_id')
     .groupBy('articles.article_id')
     .orderBy(sort_by, order)
-    .where('articles.author', 'LIKE', author)
-    .where('articles.topic', 'LIKE', topic);
+    .modify(chain => {
+      if (author) chain.where('articles.author', author);
+      if (topic) chain.where('articles.topic', topic);
+    });
 };
