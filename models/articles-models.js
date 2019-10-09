@@ -26,3 +26,20 @@ exports.amendArticle = (article_id, inc_votes) => {
       else return article;
     });
 };
+
+exports.selectArticles = ({
+  sort_by = 'created_at',
+  order = 'desc',
+  author = '%',
+  topic = '%'
+}) => {
+  return connection
+    .select('articles.*')
+    .from('articles')
+    .count('comments.article_id as comment_count')
+    .leftJoin('comments', 'comments.article_id', '=', 'articles.article_id')
+    .groupBy('articles.article_id')
+    .orderBy(sort_by, order)
+    .where('articles.author', 'LIKE', author)
+    .where('articles.topic', 'LIKE', topic);
+};

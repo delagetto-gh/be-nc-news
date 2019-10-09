@@ -7,3 +7,7 @@ exports.handleCustomErrors = (err, req, res, next) => {
 exports.handleRejectionErrors = (err, req, res, next) => {
   console.log(err);
 };
+
+exports.handleInvalidMethods = (req, res, next) => {
+  res.status(405).send({ msg: 'method not allowed' });
+};

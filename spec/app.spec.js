@@ -1,7 +1,10 @@
 process.env.NODE_ENV = 'test';
 const app = require('../app');
 const request = require('supertest');
+const chai = require('chai');
+const chaiSorted = require('sams-chai-sorted');
 const { expect } = require('chai');
+chai.use(chaiSorted);
 const { connection } = require('../connection');
 
 describe('app', () => {
@@ -14,6 +17,16 @@ describe('app', () => {
         .expect(404)
         .then(({ body: { msg } }) => {
           expect(msg).to.be.equal('bad path');
+        });
+    });
+  });
+  describe('invalid method', () => {
+    it('DELETE 405: returns a 405 error in the event of an invalid method being requested', () => {
+      return request(app)
+        .delete('/api/topics')
+        .expect(405)
+        .then(({ body: { msg } }) => {
+          expect(msg).to.be.equal('method not allowed');
         });
     });
   });
@@ -65,6 +78,14 @@ describe('app', () => {
             );
           });
       });
+      it('GET 404: "/:article_id" returns a 404 error where no article is found', () => {
+        return request(app)
+          .get('/api/articles/15')
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.be.equal('article not found');
+          });
+      });
       it('PATCH 201: "/:article_id" returns a 201 with the article object', () => {
         return request(app)
           .patch('/api/articles/2')
@@ -74,7 +95,7 @@ describe('app', () => {
             expect(article.votes).to.be.equal(5);
           });
       });
-      it('PATCH 400: "/:article_id" returns a 400 error when passed a bad request', () => {
+      it('PATCH 400: "/:article_id" returns a 400 error when passed a bad request (one invalid item)', () => {
         return request(app)
           .patch('/api/articles/2')
           .send({ dec_votes: 5 })
@@ -85,7 +106,7 @@ describe('app', () => {
             );
           });
       });
-      it('PATCH 400: "/:article_id" returns a 400 error when passed a bad request', () => {
+      it('PATCH 400: "/:article_id" returns a 400 error when passed a bad request (one valid, one invalid)', () => {
         return request(app)
           .patch('/api/articles/2')
           .send({ inc_votes: 5, something: 'somethingelse' })
@@ -96,12 +117,58 @@ describe('app', () => {
             );
           });
       });
-      it('GET 404: "/:article_id" returns a 404 error where no article is found', () => {
+      it('GET 200: "/" returns all articles', () => {
         return request(app)
-          .get('/api/articles/15')
-          .expect(404)
-          .then(({ body: { msg } }) => {
-            expect(msg).to.be.equal('article not found');
+          .get('/api/articles')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles.length).to.be.equal(12);
+            expect(articles[0]).to.have.keys(
+              'author',
+              'title',
+              'article_id',
+              'body',
+              'topic',
+              'created_at',
+              'votes',
+              'comment_count'
+            );
+          });
+      });
+      it('GET 200: "/?sort_by=topic" returns all articles sorted by topic in zetabetical order', () => {
+        return request(app)
+          .get('/api/articles/?sort_by=topic')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.be.sortedBy('topic', { descending: true });
+          });
+      });
+      it('GET 200: "/?sort_by=topic&order=asc" returns all articles sorted by topic in alphabetical order', () => {
+        return request(app)
+          .get('/api/articles/?sort_by=topic&order=asc')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.be.sortedBy('topic', { ascending: true });
+          });
+      });
+      it('GET 200: "/?author=rogersop" returns all articles by rogersop', () => {
+        return request(app)
+          .get('/api/articles/?author=rogersop')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            articles.forEach(article => {
+              expect(article.author).to.be.equal('rogersop');
+            });
+          });
+      });
+      it('GET 200: "/?topic=cats" returns all articles by rogersop', () => {
+        return request(app)
+          .get('/api/articles/?topic=cats')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            articles.forEach(article => {
+              expect(article.topic).to.be.equal('cats');
+            });
           });
       });
     });

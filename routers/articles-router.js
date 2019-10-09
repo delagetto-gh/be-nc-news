@@ -1,8 +1,15 @@
 const articlesRouter = require('express').Router();
 const {
   getArticle,
-  patchArticle
+  patchArticle,
+  getArticles
 } = require('../controllers/articles-controller');
+const { handleInvalidMethods } = require('../error-handlers');
+
+articlesRouter
+  .route('/')
+  .get(getArticles)
+  .all(handleInvalidMethods);
 
 articlesRouter
   .route('/:article_id')
