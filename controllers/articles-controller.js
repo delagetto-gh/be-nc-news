@@ -41,17 +41,10 @@ exports.patchArticle = (req, res, next) => {
 exports.getArticles = (req, res, next) => {
   selectArticles(req.query)
     .then(([selectedArticles, allArticles]) => {
-      if (!selectedArticles.length) {
-        next({
-          status: 404,
-          msg: 'no articles to return for query'
-        });
-      } else {
-        res.status(200).send({
-          articles: selectedArticles,
-          total_count: allArticles.length
-        });
-      }
+      res.status(200).send({
+        articles: selectedArticles,
+        total_count: allArticles.length
+      });
     })
     .catch(next);
 };

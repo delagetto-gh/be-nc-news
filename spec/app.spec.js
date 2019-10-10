@@ -195,7 +195,24 @@ describe('app', () => {
             });
           });
       });
-      it('GET 200: "?topic=cats" returns all articles by rogersop', () => {
+      it('GET 404: "?author=not_a_user" returns a 404 error', () => {
+        return request(app)
+          .get('/api/articles/?author=GustavHolst')
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.be.equal('user GustavHolst not found');
+          });
+      });
+      it('GET 200: "?author=lurker" returns a blank array', () => {
+        return request(app)
+          .get('/api/articles/?author=lurker')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.be.an('array');
+            expect(articles.length).to.be.equal(0);
+          });
+      });
+      it('GET 200: "?topic=cats" returns all articles where topic = cats', () => {
         return request(app)
           .get('/api/articles/?topic=cats')
           .expect(200)
@@ -226,7 +243,15 @@ describe('app', () => {
           .get('/api/articles/?topic=80s_balkan_music')
           .expect(404)
           .then(({ body: { msg } }) => {
-            expect(msg).to.be.equal('no articles to return for query');
+            expect(msg).to.be.equal('topic not found');
+          });
+      });
+      it('GET 200: "?topic=paper" returns a blank array', () => {
+        return request(app)
+          .get('/api/articles/?topic=paper')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.be.eql([]);
           });
       });
       it('GET 200: "?limit=5" limits the number of responses to 5', () => {
