@@ -42,7 +42,7 @@ exports.selectArticles = ({
   if (isNaN(parseInt(limit))) limit = 10;
   if (isNaN(parseInt(p))) p = 1;
 
-  return connection
+  const selectedArticles = connection
     .select('articles.*')
     .from('articles')
     .count('comments.article_id as comment_count')
@@ -54,13 +54,19 @@ exports.selectArticles = ({
     .modify(chain => {
       if (author) chain.where('articles.author', author);
       if (topic) chain.where('articles.topic', topic);
-    })
-    .then(articles => {
-      if (!articles.length)
-        return Promise.reject({
-          status: 404,
-          msg: 'no articles to return for query'
-        });
-      else return articles;
     });
+
+  const allArticles = connection
+    .select('articles.*')
+    .from('articles')
+    .count('comments.article_id as comment_count')
+    .leftJoin('comments', 'comments.article_id', '=', 'articles.article_id')
+    .groupBy('articles.article_id')
+    .orderBy(sort_by, order)
+    .modify(chain => {
+      if (author) chain.where('articles.author', author);
+      if (topic) chain.where('articles.topic', topic);
+    });
+
+  return Promise.all([selectedArticles, allArticles]);
 };

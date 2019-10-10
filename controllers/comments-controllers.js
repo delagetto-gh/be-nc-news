@@ -36,11 +36,22 @@ exports.getComments = (req, res, next) => {
       msg: 'bad request - article_id must be a number'
     });
   } else {
-    const { sort_by } = req.query;
-    const { order } = req.query;
-    selectComments(article_id, sort_by, order)
-      .then(comments => {
-        res.status(200).send({ comments });
+    selectComments(
+      article_id,
+      req.query.sort_by,
+      req.query.order,
+      req.query.limit,
+      req.query.p
+    )
+      .then(([limitedComments, allComments]) => {
+        if (!limitedComments.length) {
+          next({ status: 404, msg: 'no comments found' });
+        } else {
+          res.status(200).send({
+            comments: limitedComments,
+            total_count: allComments.length
+          });
+        }
       })
       .catch(next);
   }

@@ -272,6 +272,15 @@ describe('app', () => {
             expect(articles).to.be.sortedBy('article_id', { ascending: true });
           });
       });
+      it('GET 200: "/" includes a total_count of all articles, regardless of limit', () => {
+        return request(app)
+          .get('/api/articles/')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles.length).to.be.equal(10);
+            expect(body.total_count).to.be.equal(12);
+          });
+      });
     });
     describe('/comments', () => {
       it('POST 201: "/" returns a posted article', () => {
@@ -406,6 +415,60 @@ describe('app', () => {
           .expect(200)
           .then(({ body: { comments } }) => {
             expect(comments).to.be.sortedBy('created_at', { descending: true });
+          });
+      });
+      it('GET 200: "?limit=5" limits the number of responses to 5', () => {
+        return request(app)
+          .get('/api/articles/1/comments?limit=5')
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments).to.have.length(5);
+          });
+      });
+      it('GET 200: "?sort_by=article_id&order=asc&limit=5&p=2" shows the second page of responses (6-10)', () => {
+        return request(app)
+          .get(
+            '/api/articles/1/comments?sort_by=comment_id&order=asc&limit=5&p=2'
+          )
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments).to.have.length(5);
+            expect(comments[0].comment_id).to.be.equal(7);
+            expect(comments).to.be.sortedBy('comment_id', { ascending: true });
+          });
+      });
+      it('GET 200: "/" limits the number of responses to 10 by default', () => {
+        return request(app)
+          .get('/api/articles/1/comments')
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments).to.have.length(10);
+          });
+      });
+      it('GET 200: bad limit in request ignores the bad limit and defaults to 10', () => {
+        return request(app)
+          .get('/api/articles/1/comments?limit=five')
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments).to.have.length(10);
+          });
+      });
+      it('GET 200: bad page in request ignores the bad page and defaults to 1', () => {
+        return request(app)
+          .get('/api/articles/1/comments?sort_by=comment_id&order=asc&p=page1')
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments[0].article_id).to.be.equal(1);
+            expect(comments).to.be.sortedBy('article_id', { ascending: true });
+          });
+      });
+      it('GET 200: "/" includes a total_count of all articles, regardless of limit', () => {
+        return request(app)
+          .get('/api/articles/1/comments')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments.length).to.be.equal(10);
+            expect(body.total_count).to.be.equal(13);
           });
       });
       it('PATCH 201: "/:comment_id" returns a 201 with the comment object', () => {

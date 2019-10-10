@@ -15,20 +15,31 @@ exports.insertComment = (article_id, comment) => {
     });
 };
 
-exports.selectComments = (article_id, sort_by = 'created_at', order) => {
+exports.selectComments = (
+  article_id,
+  sort_by = 'created_at',
+  order,
+  limit,
+  p
+) => {
+  if (isNaN(parseInt(limit))) limit = 10;
+  if (isNaN(parseInt(p))) p = 1;
   if (order !== 'asc') order = 'desc';
-  return connection
+
+  const limitedComments = connection
     .select('*')
     .from('comments')
     .where({ article_id })
     .orderBy(sort_by, order)
-    .then(comments => {
-      if (!comments.length)
-        return Promise.reject({ status: 404, msg: 'no comments found' });
-      else {
-        return comments;
-      }
-    });
+    .limit(limit)
+    .offset(limit * (p - 1));
+
+  const allComments = connection
+    .select('*')
+    .from('comments')
+    .where({ article_id });
+
+  return Promise.all([limitedComments, allComments]);
 };
 
 exports.updateComment = (comment_id, inc_votes) => {
