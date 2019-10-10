@@ -34,9 +34,14 @@ exports.selectArticles = ({
   sort_by = 'created_at',
   order = 'desc',
   author,
-  topic
+  topic,
+  limit,
+  p
 }) => {
   if (order !== 'asc') order = 'desc';
+  if (isNaN(parseInt(limit))) limit = 10;
+  if (isNaN(parseInt(p))) p = 1;
+
   return connection
     .select('articles.*')
     .from('articles')
@@ -44,6 +49,8 @@ exports.selectArticles = ({
     .leftJoin('comments', 'comments.article_id', '=', 'articles.article_id')
     .groupBy('articles.article_id')
     .orderBy(sort_by, order)
+    .limit(limit)
+    .offset(limit * (p - 1))
     .modify(chain => {
       if (author) chain.where('articles.author', author);
       if (topic) chain.where('articles.topic', topic);

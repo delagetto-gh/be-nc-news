@@ -20,8 +20,8 @@ exports.postComment = (req, res, next) => {
       });
     } else {
       insertComment(article_id, req.body)
-        .then(postedComment => {
-          res.status(201).send({ postedComment });
+        .then(comment => {
+          res.status(201).send({ comment });
         })
         .catch(next);
     }
@@ -47,7 +47,7 @@ exports.getComments = (req, res, next) => {
 };
 
 exports.patchComment = (req, res, next) => {
-  if (!Object.keys(req.body).every(item => item === 'inc_votes')) {
+  if (JSON.stringify(Object.keys(req.body)) !== '["inc_votes"]') {
     return next({
       status: 400,
       msg: 'bad request: request must be for inc_votes and inc_votes only'
@@ -59,8 +59,8 @@ exports.patchComment = (req, res, next) => {
     });
   } else {
     updateComment(req.params.comment_id, req.body.inc_votes)
-      .then(([patchedComment]) => {
-        res.status(201).send({ patchedComment });
+      .then(([comment]) => {
+        res.status(200).send({ comment });
       })
       .catch(next);
   }

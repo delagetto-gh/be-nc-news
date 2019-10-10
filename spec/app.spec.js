@@ -103,11 +103,11 @@ describe('app', () => {
             expect(msg).to.be.equal('bad request: article_id must be a number');
           });
       });
-      it('PATCH 201: "/:article_id" returns a 201 with the article object', () => {
+      it('PATCH 200: "/:article_id" returns a 201 with the article object', () => {
         return request(app)
           .patch('/api/articles/2')
           .send({ inc_votes: 5 })
-          .expect(201)
+          .expect(200)
           .then(({ body: { article } }) => {
             expect(article.votes).to.be.equal(5);
           });
@@ -157,7 +157,6 @@ describe('app', () => {
           .get('/api/articles')
           .expect(200)
           .then(({ body: { articles } }) => {
-            expect(articles.length).to.be.equal(12);
             expect(articles[0]).to.have.keys(
               'author',
               'title',
@@ -230,6 +229,49 @@ describe('app', () => {
             expect(msg).to.be.equal('no articles to return for query');
           });
       });
+      it('GET 200: "?limit=5" limits the number of responses to 5', () => {
+        return request(app)
+          .get('/api/articles/?limit=5')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.have.length(5);
+          });
+      });
+      it('GET 200: "?sort_by=article_id&order=asc&limit=5&p=2" shows the second page of responses (6-10)', () => {
+        return request(app)
+          .get('/api/articles/?sort_by=article_id&order=asc&limit=5&p=2')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.have.length(5);
+            expect(articles[0].article_id).to.be.equal(6);
+            expect(articles).to.be.sortedBy('article_id', { ascending: true });
+          });
+      });
+      it('GET 200: "/" limits the number of responses to 10 by default', () => {
+        return request(app)
+          .get('/api/articles/')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.have.length(10);
+          });
+      });
+      it('GET 200: bad limit in request ignores the bad limit and defaults to 10', () => {
+        return request(app)
+          .get('/api/articles/?limit=five')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.have.length(10);
+          });
+      });
+      it('GET 200: bad page in request ignores the bad page and defaults to 1', () => {
+        return request(app)
+          .get('/api/articles/?sort_by=article_id&order=asc&p=page1')
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles[0].article_id).to.be.equal(1);
+            expect(articles).to.be.sortedBy('article_id', { ascending: true });
+          });
+      });
     });
     describe('/comments', () => {
       it('POST 201: "/" returns a posted article', () => {
@@ -241,8 +283,8 @@ describe('app', () => {
             article_id: 1
           })
           .expect(201)
-          .then(({ body: { postedComment } }) => {
-            expect(postedComment).to.have.keys(
+          .then(({ body: { comment } }) => {
+            expect(comment).to.have.keys(
               'comment_id',
               'author',
               'article_id',
@@ -250,7 +292,7 @@ describe('app', () => {
               'created_at',
               'body'
             );
-            expect(postedComment.comment_id).to.be.equal(19);
+            expect(comment.comment_id).to.be.equal(19);
           });
       });
       it('POST 400: request w/ bad keys returns "bad request..."', () => {
@@ -370,9 +412,9 @@ describe('app', () => {
         return request(app)
           .patch('/api/comments/1')
           .send({ inc_votes: -5 })
-          .expect(201)
-          .then(({ body: { patchedComment } }) => {
-            expect(patchedComment).to.have.keys(
+          .expect(200)
+          .then(({ body: { comment } }) => {
+            expect(comment).to.have.keys(
               'comment_id',
               'author',
               'article_id',
@@ -380,7 +422,7 @@ describe('app', () => {
               'created_at',
               'body'
             );
-            expect(patchedComment.votes).to.be.equal(11);
+            expect(comment.votes).to.be.equal(11);
           });
       });
       it('PATCH 404: request w/ non - existent comment_id returns a 404', () => {
@@ -416,6 +458,15 @@ describe('app', () => {
             );
           });
       });
+      it('PATCH 400: request w/ bad comment_id returns a 400', () => {
+        return request(app)
+          .patch('/api/comments/not-an-id')
+          .send({ inc_votes: 5 })
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.be.equal(`syntax error for requested value`);
+          });
+      });
       it('DELETE 204: "/" responds with a 204 error (no body) for successful deletion', () => {
         return request(app)
           .delete('/api/comments/1')
@@ -429,6 +480,14 @@ describe('app', () => {
             expect(msg).to.be.equal(
               `no comment with comment_id: 30 to delete found`
             );
+          });
+      });
+      it('DELETE 400: request w/ bad comment_id returns a 400', () => {
+        return request(app)
+          .delete('/api/comments/not-a-number')
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.be.equal(`syntax error for requested value`);
           });
       });
     });

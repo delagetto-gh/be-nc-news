@@ -32,7 +32,6 @@ exports.selectComments = (article_id, sort_by = 'created_at', order) => {
 };
 
 exports.updateComment = (comment_id, inc_votes) => {
-  
   return connection('comments')
     .where({ comment_id })
     .increment({ votes: inc_votes })
@@ -51,9 +50,8 @@ exports.removeComment = comment_id => {
   return connection('comments')
     .where({ comment_id })
     .del()
-    .returning('*')
-    .then(deletedComment => {
-      if (!deletedComment.length)
+    .then(deleteCount => {
+      if (!deleteCount)
         return Promise.reject({
           status: 404,
           msg: `no comment with comment_id: ${comment_id} to delete found`

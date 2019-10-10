@@ -4,10 +4,14 @@ const usersRouter = require('./users-router');
 const articlesRouter = require('./articles-router');
 const commentsRouter = require('./comments-router');
 const apiJSON = require('../endpoints.json');
+const { handleInvalidMethods } = require('../error-handlers');
 
-apiRouter.get('/', (req, res, next) => {
-  res.json(apiJSON);
-});
+apiRouter
+  .route('/')
+  .get((req, res, next) => {
+    res.json(apiJSON);
+  })
+  .all(handleInvalidMethods);
 
 apiRouter.use('/topics', topicsRouter);
 

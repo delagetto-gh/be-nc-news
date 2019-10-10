@@ -18,7 +18,7 @@ exports.getArticle = (req, res, next) => {
 };
 
 exports.patchArticle = (req, res, next) => {
-  if (Object.keys(req.body).some(item => item !== 'inc_votes')) {
+  if (JSON.stringify(Object.keys(req.body)) !== '["inc_votes"]') {
     next({
       status: 400,
       msg: 'bad request: patch request must be for inc_votes only'
@@ -31,7 +31,7 @@ exports.patchArticle = (req, res, next) => {
       const { article_id } = req.params;
       amendArticle(article_id, inc_votes)
         .then(([article]) => {
-          res.status(201).send({ article });
+          res.status(200).send({ article });
         })
         .catch(next);
     }
