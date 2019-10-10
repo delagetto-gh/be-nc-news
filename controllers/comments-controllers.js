@@ -44,14 +44,10 @@ exports.getComments = (req, res, next) => {
       req.query.p
     )
       .then(([limitedComments, allComments]) => {
-        if (!limitedComments.length) {
-          next({ status: 404, msg: 'no comments found' });
-        } else {
-          res.status(200).send({
-            comments: limitedComments,
-            total_count: allComments.length
-          });
-        }
+        res.status(200).send({
+          comments: limitedComments,
+          total_count: allComments.length
+        });
       })
       .catch(next);
   }

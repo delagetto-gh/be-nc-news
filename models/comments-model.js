@@ -1,4 +1,5 @@
 const { connection } = require('../connection');
+const { selectArticle } = require('../models/articles-models');
 
 exports.insertComment = (article_id, comment) => {
   const formattedComment = { ...comment, article_id };
@@ -26,6 +27,8 @@ exports.selectComments = (
   if (isNaN(parseInt(p))) p = 1;
   if (order !== 'asc') order = 'desc';
 
+  const articleExistence = selectArticle(article_id);
+
   const limitedComments = connection
     .select('*')
     .from('comments')
@@ -39,7 +42,7 @@ exports.selectComments = (
     .from('comments')
     .where({ article_id });
 
-  return Promise.all([limitedComments, allComments]);
+  return Promise.all([limitedComments, allComments, articleExistence]);
 };
 
 exports.updateComment = (comment_id, inc_votes) => {

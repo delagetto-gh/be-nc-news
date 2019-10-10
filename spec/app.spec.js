@@ -308,7 +308,7 @@ describe('app', () => {
       });
     });
     describe('/comments', () => {
-      it('POST 201: "/" returns a posted article', () => {
+      it('POST 201: "/" returns a posted comment', () => {
         return request(app)
           .post('/api/articles/1/comments')
           .send({
@@ -391,10 +391,19 @@ describe('app', () => {
           .get('/api/articles/45/comments')
           .expect(404)
           .then(({ body: { msg } }) => {
-            expect(msg).to.equal('no comments found');
+            expect(msg).to.equal('article not found');
           });
       });
-      it('GET 200: "/" articles are sorted by created_at in descending order by default', () => {
+      it('GET 200: request for comments for an uncommented article returns a blank array', () => {
+        return request(app)
+          .get('/api/articles/3/comments')
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments).to.be.an('array');
+            expect(comments.length).to.be.equal(0);
+          });
+      });
+      it('GET 200: "/" comments are sorted by created_at in descending order by default', () => {
         return request(app)
           .get('/api/articles/1/comments')
           .expect(200)
@@ -402,7 +411,7 @@ describe('app', () => {
             expect(comments).to.be.sortedBy('created_at', { descending: true });
           });
       });
-      it('GET 200: "?sort_by=votes" articles are sorted by votes in descending order', () => {
+      it('GET 200: "?sort_by=votes" comments are sorted by votes in descending order', () => {
         return request(app)
           .get('/api/articles/1/comments?sort_by=votes')
           .expect(200)
@@ -410,7 +419,7 @@ describe('app', () => {
             expect(comments).to.be.sortedBy('votes', { descending: true });
           });
       });
-      it('GET 200: "?order=asc" articles are sorted by created_at in ascending order', () => {
+      it('GET 200: "?order=asc" comments are sorted by created_at in ascending order', () => {
         return request(app)
           .get('/api/articles/1/comments?order=asc')
           .expect(200)
@@ -418,7 +427,7 @@ describe('app', () => {
             expect(comments).to.be.sortedBy('created_at', { ascending: true });
           });
       });
-      it('GET 200: "?order=BAD" articles are still sorted by created_at in descending order', () => {
+      it('GET 200: "?order=BAD" comments are still sorted by created_at in descending order', () => {
         return request(app)
           .get('/api/articles/1/comments?order=BAD')
           .expect(200)
@@ -487,7 +496,7 @@ describe('app', () => {
             expect(comments).to.be.sortedBy('article_id', { ascending: true });
           });
       });
-      it('GET 200: "/" includes a total_count of all articles, regardless of limit', () => {
+      it('GET 200: "/" includes a total_count of all comments, regardless of limit', () => {
         return request(app)
           .get('/api/articles/1/comments')
           .expect(200)
