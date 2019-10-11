@@ -50,6 +50,47 @@ describe('app', () => {
             expect(topics[0]).to.have.keys('description', 'slug');
           });
       });
+      it('POST 201: "/" returns the posted topic', () => {
+        return request(app)
+          .post('/api/topics')
+          .send({
+            slug: 'BalkanBeatBox',
+            description:
+              "A place to discuss 00's balkan rap group Balkan Beat Box"
+          })
+          .expect(201)
+          .then(({ body: { topic } }) => {
+            expect(topic).to.be.eql({
+              slug: 'BalkanBeatBox',
+              description:
+                "A place to discuss 00's balkan rap group Balkan Beat Box"
+            });
+          });
+      });
+      it('POST 400: "/" with a missing slug returns a 400', () => {
+        return request(app)
+          .post('/api/topics')
+          .send({
+            description:
+              "A place to discuss 00's gypsy punk band Balkan Beat Box"
+          })
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.be.eql('bad request: mandatory information missing');
+          });
+      });
+      it('POST 400: "/" with a duplicate slug returns a 400', () => {
+        return request(app)
+          .post('/api/topics')
+          .send({
+            slug: 'paper',
+            description: 'A place to discuss paper'
+          })
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.be.eql('primary key already exists');
+          });
+      });
     });
     describe('/users', () => {
       it('GET 200: "/real_user" returns a user with that username', () => {
@@ -66,6 +107,86 @@ describe('app', () => {
           .expect(404)
           .then(({ body: { msg } }) => {
             expect(msg).to.be.equal('user GustavHolst not found');
+          });
+      });
+      it('POST 201: "/" returns the posted user', () => {
+        return request(app)
+          .post('/api/users')
+          .send({
+            username: 'GustavHolst',
+            name: 'Gustav Holst'
+          })
+          .expect(201)
+          .then(({ body: { user } }) => {
+            expect(user).to.be.eql({
+              username: 'GustavHolst',
+              avatar_url: null,
+              name: 'Gustav Holst'
+            });
+          });
+      });
+      it('POST 400: "/" request with a missing username returns a 400 error', () => {
+        return request(app)
+          .post('/api/users')
+          .send({
+            name: 'Gustav Holst'
+          })
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.be.equal(
+              'bad request: mandatory information missing'
+            );
+          });
+      });
+      it('POST 400: "/" request with a duplicate username returns a 400 error', () => {
+        return request(app)
+          .post('/api/users')
+          .send({ username: 'lurker', name: 'lurky lurkenstein' })
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.be.equal('primary key already exists');
+          });
+      });
+      it('GET 200: "/" returns an array of all users', () => {
+        return request(app)
+          .get('/api/users')
+          .expect(200)
+          .then(({ body: { users } }) => {
+            expect(users).to.be.an('array');
+            expect(users).to.have.length(4);
+            expect(users[0]).to.have.keys('username', 'avatar_url', 'name');
+          });
+      });
+      it('GET 200: "?limit=3" limits the number of results to 3', () => {
+        return request(app)
+          .get('/api/users?limit=3')
+          .expect(200)
+          .then(({ body: { users } }) => {
+            expect(users).to.have.length(3);
+          });
+      });
+      it('GET 200: "?limit=3&p=2" returns the second page of results', () => {
+        return request(app)
+          .get('/api/users?limit=3&p=2')
+          .expect(200)
+          .then(({ body: { users } }) => {
+            expect(users).to.have.length(1);
+          });
+      });
+      it('GET 200: response includes a total count', () => {
+        return request(app)
+          .get('/api/users?limit=3')
+          .expect(200)
+          .then(({ body: { total_count } }) => {
+            expect(total_count).to.be.equal(4);
+          });
+      });
+      it('GET 400: bad query responds with a 400 error', () => {
+        return request(app)
+          .get('/api/users?limit=three')
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.be.equal('bad request: limit must be a number');
           });
       });
     });
@@ -227,7 +348,9 @@ describe('app', () => {
           .get('/api/articles/?sort_by=not_a_column')
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).to.be.equal('bad request: query column is not valid');
+            expect(msg).to.be.equal(
+              'bad request: one or more fields not valid'
+            );
           });
       });
       it('GET 200: "?order=random_order" still returns the data and orders in the default (descending)', () => {
@@ -306,6 +429,93 @@ describe('app', () => {
             expect(body.total_count).to.be.equal(12);
           });
       });
+      it('POST 201: "/" returns the posted article', () => {
+        return request(app)
+          .post('/api/articles')
+          .send({
+            title: 'Why I chose to break my silence',
+            body: "I've had enough! ...",
+            author: 'lurker',
+            topic: 'paper'
+          })
+          .expect(200)
+          .then(({ body: { article } }) => {
+            expect(article.article_id).to.be.equal(13);
+            expect(article).to.contain.keys('title', 'body');
+          });
+      });
+      it('POST 400: post with missing non-nullable fields returns a 400 response', () => {
+        return request(app)
+          .post('/api/articles')
+          .send({
+            title: 'Why I chose to break my silence',
+            body: "I've had enough! ...",
+            topic: 'paper'
+          })
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.be.equal(
+              'bad request: mandatory information missing'
+            );
+          });
+      });
+      it('POST 400: post with erroneous fields returns a 400 response', () => {
+        return request(app)
+          .post('/api/articles')
+          .send({
+            title: 'Why I chose to break my silence',
+            body: "I've had enough! ...",
+            author: 'lurker',
+            topic: 'paper',
+            something: 'something else'
+          })
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.be.equal(
+              'bad request: one or more fields not valid'
+            );
+          });
+      });
+      it('POST 400: post with erroneous fields returns a 400 response', () => {
+        return request(app)
+          .post('/api/articles')
+          .send({
+            title: 'Why I chose to break my silence',
+            body: "I've had enough! ...",
+            author: 'turk turkleton',
+            topic: 'paper'
+          })
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.be.equal('username, topic or article not found');
+          });
+      });
+      it('DELETE 204: "/:article_id" returns a 204 with no body', () => {
+        return request(app)
+          .delete('/api/articles/1')
+          .expect(204);
+      });
+      it('DELETE 204: "/:article_id" deletes all article\'s comments (where there are any)', () => {
+        return request(app)
+          .delete('/api/articles/1')
+          .expect(204)
+          .then(() => {
+            return request(app)
+              .get('/api/articles/1/comments')
+              .expect(404)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.be.equal('article not found');
+              });
+          });
+      });
+      it('DELETE 404: "/not_an_article_id" returns a 404', () => {
+        return request(app)
+          .delete('/api/articles/20')
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.be.equal('article not found');
+          });
+      });
     });
     describe('/comments', () => {
       it('POST 201: "/" returns a posted comment', () => {
@@ -355,7 +565,7 @@ describe('app', () => {
           .send({ username: 'GustavHolst', body: 'testing, testing 1,2' })
           .expect(404)
           .then(({ body: { msg } }) => {
-            expect(msg).to.equal('username or article not found');
+            expect(msg).to.equal('username, topic or article not found');
           });
       });
       it('POST 404: request w/ non-existent article_id returns 404', () => {
@@ -364,7 +574,7 @@ describe('app', () => {
           .send({ username: 'butter_bridge', body: 'testing, testing 1,2' })
           .expect(404)
           .then(({ body: { msg } }) => {
-            expect(msg).to.equal('username or article not found');
+            expect(msg).to.equal('username, topic or article not found');
           });
       });
       it('GET 200: "/" returns all comments for a specified article', () => {
@@ -440,7 +650,9 @@ describe('app', () => {
           .get('/api/articles/1/comments?sort_by=not_a_ting')
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).to.be.equal('bad request: query column is not valid');
+            expect(msg).to.be.equal(
+              'bad request: one or more fields not valid'
+            );
           });
       });
       it('GET 200: "?order=random_order" still returns the data and orders in the default (descending)', () => {

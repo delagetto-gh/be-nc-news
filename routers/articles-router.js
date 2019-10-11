@@ -2,7 +2,8 @@ const articlesRouter = require('express').Router();
 const {
   getArticle,
   patchArticle,
-  getArticles
+  getArticles,
+  postArticle, deleteArticle
 } = require('../controllers/articles-controller');
 const { handleInvalidMethods } = require('../error-handlers');
 const {
@@ -13,12 +14,13 @@ const {
 articlesRouter
   .route('/')
   .get(getArticles)
+  .post(postArticle)
   .all(handleInvalidMethods);
 
 articlesRouter
   .route('/:article_id')
   .get(getArticle)
-  .patch(patchArticle)
+  .patch(patchArticle).delete(deleteArticle)
   .all(handleInvalidMethods);
 
 articlesRouter

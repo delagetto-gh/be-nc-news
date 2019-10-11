@@ -1,7 +1,9 @@
 const {
   selectArticle,
   amendArticle,
-  selectArticles
+  selectArticles,
+  insertArticle,
+  removeArticle
 } = require('../models/articles-models');
 
 exports.getArticle = (req, res, next) => {
@@ -45,6 +47,22 @@ exports.getArticles = (req, res, next) => {
         articles: selectedArticles,
         total_count: allArticles.length
       });
+    })
+    .catch(next);
+};
+
+exports.postArticle = (req, res, next) => {
+  insertArticle(req.body)
+    .then(([article]) => {
+      res.status(200).send({ article });
+    })
+    .catch(next);
+};
+
+exports.deleteArticle = (req, res, next) => {
+  removeArticle(req.params)
+    .then(() => {
+      res.sendStatus(204);
     })
     .catch(next);
 };

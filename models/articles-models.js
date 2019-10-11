@@ -83,3 +83,21 @@ exports.selectArticles = ({
     topicExistence
   ]);
 };
+
+exports.insertArticle = body => {
+  return connection
+    .insert(body)
+    .into('articles')
+    .returning('*');
+};
+
+exports.removeArticle = ({ article_id }) => {
+  return connection('articles')
+    .where({ article_id })
+    .del()
+    .then(deleteCount => {
+      if (!deleteCount)
+        return Promise.reject({ status: 404, msg: 'article not found' });
+      return;
+    });
+};

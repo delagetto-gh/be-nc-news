@@ -6,11 +6,15 @@ exports.handleCustomErrors = (err, req, res, next) => {
 
 exports.handlePSQLErrors = (err, req, res, next) => {
   if (err.code === '23503') {
-    res.status(404).send({ msg: 'username or article not found' });
+    res.status(404).send({ msg: 'username, topic or article not found' });
   } else if (err.code === '42703') {
-    res.status(400).send({ msg: 'bad request: query column is not valid' });
+    res.status(400).send({ msg: 'bad request: one or more fields not valid' });
+  } else if (err.code === '23502') {
+    res.status(400).send({ msg: 'bad request: mandatory information missing' });
   } else if (err.code === '22P02') {
     res.status(400).send({ msg: 'syntax error for requested value' });
+  } else if (err.code === '23505') {
+    res.status(400).send({ msg: 'primary key already exists' });
   } else next(err);
 };
 

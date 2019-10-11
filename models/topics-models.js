@@ -13,3 +13,10 @@ exports.selectTopics = topic => {
       return topics;
     });
 };
+
+exports.insertTopic = topic => {
+  return connection
+    .insert(topic)
+    .into('topics')
+    .returning('*');
+};
