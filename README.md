@@ -2,6 +2,8 @@
 
 Eamon's NC News is an application open to all that allows users to post articles, comment on articles, upvote articles & comments or simply lurk.
 
+[Hosted Version](http://eamons-nc-news.herokuapp.com/api)
+
 ## Getting Started
 
 To download a version on Eamon's NC News and make changes, simply:
@@ -130,10 +132,6 @@ Errors within the application have been dealt with using the following logic:
 * PSQL errors, which are typically due to clients sending bad requests but were unable to be handled by custom errors, are handled within their own error handler and responses are driven by the SQL error codes.
 
 All errors are handled within error-handlers.js.
-
-## Deployment
-
-Eamon's NC News can be deployed live into a production environment by hosting on Heroku.
 
 ## Authors
 
