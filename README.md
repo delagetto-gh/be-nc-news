@@ -44,7 +44,7 @@ Chai Sorted is an extension of Chai that allows for testing whether arrays of ob
 
 #### Mocha
 
-Mocha is a feature-rich JavaScript test framework running on Node.js, which is particualrly good for asynchronous testing. Mocha tests run serially, allowing for flexible and accurate reporting, while mapping uncaught exceptions to the correct test cases.
+Mocha is a feature-rich JavaScript test framework running on Node.js, which is particularly good for asynchronous testing. Mocha tests run serially, allowing for flexible and accurate reporting, while mapping uncaught exceptions to the correct test cases.
 
 #### Supertest
 
@@ -99,7 +99,7 @@ Running the tests using `npm test` (more detailed below) will seed the test data
 
 ## Testing
 
-Each built endpoint has been given extensive tests in the file /spec/app.spec.js. A scipt has been added to the package.json so that all tests can be ran by running the following in your CLI:
+Each built endpoint has been given extensive tests in the file /spec/app.spec.js. A script has been added to the package.json so that all tests can be ran by running the following in your CLI:
 
 ```
 npm test
