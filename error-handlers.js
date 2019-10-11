@@ -21,3 +21,7 @@ exports.handleServerErrors = (err, req, res, next) => {
 exports.handleInvalidMethods = (req, res, next) => {
   res.status(405).send({ msg: 'method not allowed' });
 };
+
+exports.badPath = (req, res, next) => {
+  res.status(404).send({ msg: 'bad path' });
+};

@@ -52,7 +52,7 @@ describe('app', () => {
       });
     });
     describe('/users', () => {
-      it('GET 200: "/:username" returns a user with that username', () => {
+      it('GET 200: "/real_user" returns a user with that username', () => {
         return request(app)
           .get('/api/users/lurker')
           .expect(200)
@@ -60,7 +60,7 @@ describe('app', () => {
             expect(user).to.have.keys('username', 'avatar_url', 'name');
           });
       });
-      it('GET 404: "/:username" returns a 404 error where no user is found', () => {
+      it('GET 404: "/not_a_real_user" returns a 404 error where no user is found', () => {
         return request(app)
           .get('/api/users/GustavHolst')
           .expect(404)
@@ -212,7 +212,7 @@ describe('app', () => {
             expect(articles.length).to.be.equal(0);
           });
       });
-      it('GET 200: "?topic=cats" returns all articles where topic = cats', () => {
+      it('GET 200: "?topic=real_topic" returns all articles for that topic', () => {
         return request(app)
           .get('/api/articles/?topic=cats')
           .expect(200)

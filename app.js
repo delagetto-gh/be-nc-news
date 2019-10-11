@@ -4,16 +4,15 @@ const apiRouter = require('./routers/api-router');
 const {
   handleCustomErrors,
   handlePSQLErrors,
-  handleServerErrors
+  handleServerErrors,
+  badPath
 } = require('./error-handlers');
 
 app.use(express.json());
 
 app.use('/api', apiRouter);
 
-app.use('/*', (req, res, next) => {
-  res.status(404).send({ msg: 'bad path' });
-});
+app.use('/*', badPath);
 
 app.use(handleCustomErrors, handlePSQLErrors, handleServerErrors);
 
