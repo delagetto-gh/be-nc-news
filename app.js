@@ -7,6 +7,8 @@ const {
   handleServerErrors,
   badPath
 } = require('./error-handlers');
+const cors = require('cors');
+App.use(cors());
 
 app.use(express.json());
 
