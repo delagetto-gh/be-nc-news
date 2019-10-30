@@ -22,7 +22,7 @@ exports.insertUser = user => {
     .returning('*');
 };
 
-exports.selectUsers = ({ limit = 5, p = 1 }) => {
+exports.selectUsers = ({ limit = 100, p = 1 }) => {
   if (isNaN(parseInt(limit)))
     return Promise.reject({
       status: 400,
