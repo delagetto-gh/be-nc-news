@@ -40,7 +40,7 @@ describe('app', () => {
           expect(body).to.be.eql(apiJSON);
         });
     });
-    describe('/topics', () => {
+    describe.only('/topics', () => {
       it('GET 200: "/" returns all topics', () => {
         return request(app)
           .get('/api/topics')

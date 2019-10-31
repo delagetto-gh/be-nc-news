@@ -5,6 +5,7 @@ exports.handleCustomErrors = (err, req, res, next) => {
 };
 
 exports.handlePSQLErrors = (err, req, res, next) => {
+  console.log(err);
   if (err.code === '23503') {
     res.status(404).send({ msg: 'username, topic or article not found' });
   } else if (err.code === '42703') {
@@ -19,7 +20,7 @@ exports.handlePSQLErrors = (err, req, res, next) => {
 };
 
 exports.handleServerErrors = (err, req, res, next) => {
-  console.log(err);
+  res.status(500).send({ msg: 'server error' });
 };
 
 exports.handleInvalidMethods = (req, res, next) => {
