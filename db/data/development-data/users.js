@@ -3,7 +3,7 @@ module.exports = [
     username: 'tickle122',
     name: 'Tom Tickle',
     avatar_url:
-      'https://www.spiritsurfers.net/monastery/wp-content/uploads/_41500270_mrtickle.jpg'
+      'http://www.femalefirst.co.uk/image-library/square/500/m/mr-tickle-image_08,11.jpg'
   },
   {
     username: 'grumpy19',
@@ -14,7 +14,7 @@ module.exports = [
     username: 'happyamy2016',
     name: 'Amy Happy',
     avatar_url:
-      'https://vignette1.wikia.nocookie.net/mrmen/images/7/7f/Mr_Happy.jpg/revision/latest?cb=20140102171729'
+      'https://c7.uihere.com/files/241/599/680/mr-happy-mr-men-birthday-party-mr-greedy-birthday-thumb.jpg'
   },
   {
     username: 'cooljmessy',
@@ -31,6 +31,6 @@ module.exports = [
     username: 'jessjelly',
     name: 'Jess Jelly',
     avatar_url:
-      'http://www.femalefirst.co.uk/image-library/square/500/m/mr-tickle-image_08,11.jpg'
+      'https://vignette.wikia.nocookie.net/mrmen/images/4/4f/MR_JELLY_4A.jpg/revision/latest?cb=20180104121141'
   }
 ];

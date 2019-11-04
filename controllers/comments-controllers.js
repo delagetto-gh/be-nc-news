@@ -9,14 +9,14 @@ exports.postComment = (req, res, next) => {
   if (!req.body.hasOwnProperty('username') || !req.body.hasOwnProperty('body'))
     return next({
       status: 400,
-      msg: 'bad request - comment must have username & body'
+      msg: 'Bad request - comment must have username & body'
     });
   else {
     const { article_id } = req.params;
     if (isNaN(parseInt(article_id))) {
       return next({
         status: 400,
-        msg: 'bad request - article_id must be a number'
+        msg: 'Bad request - article_id must be a number'
       });
     } else {
       insertComment(article_id, req.body)
@@ -33,7 +33,7 @@ exports.getComments = (req, res, next) => {
   if (isNaN(parseInt(article_id))) {
     return next({
       status: 400,
-      msg: 'bad request - article_id must be a number'
+      msg: 'Bad request - article_id must be a number'
     });
   } else {
     selectComments(
@@ -57,12 +57,12 @@ exports.patchComment = (req, res, next) => {
   if (JSON.stringify(Object.keys(req.body)) !== '["inc_votes"]') {
     return next({
       status: 400,
-      msg: 'bad request: request must be for inc_votes and inc_votes only'
+      msg: 'Bad request: request must be for inc_votes and inc_votes only'
     });
   } else if (isNaN(parseInt(req.body.inc_votes))) {
     return next({
       status: 400,
-      msg: `bad request: inc_votes value must be a number`
+      msg: `Bad request: inc_votes value must be a number`
     });
   } else {
     updateComment(req.params.comment_id, req.body.inc_votes)
