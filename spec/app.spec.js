@@ -76,7 +76,7 @@ describe('app', () => {
           })
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).to.be.eql('bad request: mandatory information missing');
+            expect(msg).to.be.eql('Bad request: mandatory information missing');
           });
       });
       it('POST 400: "/" with a duplicate slug returns a 400', () => {
@@ -88,7 +88,7 @@ describe('app', () => {
           })
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).to.be.eql('primary key already exists');
+            expect(msg).to.be.eql('Primary key already exists');
           });
       });
     });
