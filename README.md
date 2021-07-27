@@ -93,13 +93,17 @@ module.exports = { ...customConfig[ENV], ...baseConfig };
 
 ### Database Setup
 
+First, run the `createdb` command in your CLI.
+
 To set up the databases (one prod, one test), simply run the `npm run setup-dbs` in your CLI.
 
 ### Seeding Database
 
-Running the tests using `npm test` (more detailed below) will seed the test database and the seed file will also run migrations, setting up the database's tables / schema.
+To seed the databases (one prod, one test), simply run the `npm run seed` in your CLI.
 
 ## Testing
+
+Running the tests using `npm test` (more detailed below) will seed the test database and the seed file will also run migrations, setting up the database's tables / schema.
 
 Each built endpoint has been given extensive tests in the file /spec/app.spec.js. A script has been added to the package.json so that all tests can be ran by running the following in your CLI:
 
